@@ -7,3 +7,5 @@ edition = "2018"
 [dependencies]
 dera = { path = "../dera" }
 mpi = "*"
+failure = "*"
+log = "*"

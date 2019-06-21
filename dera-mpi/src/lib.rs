@@ -2,7 +2,9 @@ mod server;
 mod worker;
 mod init;
 
-use init::init_mpi_transport;
+pub use init::init_mpi_transport;
+pub use server::MpiServerTransport;
+pub use worker::MpiWorkerTransport;
 
 #[cfg(test)]
 mod tests {

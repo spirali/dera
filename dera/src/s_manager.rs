@@ -84,7 +84,7 @@ impl<Transport: ServerTransport> ServerManagerRef<Transport> {
     pub fn start(&self, on_event: impl Fn(ServerEvent)) -> Result<impl Future<Item=(), Error=Error>, Error> {
         let manager_ref = self.clone();
         let manager = self.get();
-        let (transport_future, message_stream) = manager.transport.start().unwrap();
+        let message_stream = manager.transport.start().unwrap();
         let msg_process = message_stream.for_each(move |event| {
             match event {
                 ServerTransportEvent::WorkerMessage(worker_id, TAG_CUSTOM_MESSAGE, msg) => {
@@ -99,7 +99,7 @@ impl<Transport: ServerTransport> ServerManagerRef<Transport> {
                 }
             }
         });
-        Ok(transport_future.select(msg_process).map(|_| ()).map_err(|(e, _)| e))
+        Ok(msg_process)
     }
 
     fn _process_message(&self, worker_id: WorkerId, tag: MessageTag, message: BytesMut) -> impl Future<Item=(), Error=Error> {
