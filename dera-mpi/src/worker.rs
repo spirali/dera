@@ -11,18 +11,19 @@ use dera::WorkerTransportEvent;
 use dera::MessageTag;
 
 use crate::common;
+use crate::core::Core;
 
 
 pub struct MpiWorkerTransport {
-    universe: Rc<Universe>
+    core: Rc<Core>
 }
 
 
 impl MpiWorkerTransport {
 
-    pub(crate) fn new(universe: Rc<Universe>) -> Self {
+    pub(crate) fn new(core: Rc<Core>) -> Self {
         MpiWorkerTransport {
-            universe
+            core
         }
     }
 
@@ -31,14 +32,13 @@ impl MpiWorkerTransport {
 impl MpiWorkerTransport {
 
     pub fn worker_id(&self) -> WorkerId {
-        self.universe.world().rank() as WorkerId
+        self.core.rank() as WorkerId
     }
-
 
     pub fn start(&self) -> Result<Box<Stream<Item=WorkerTransportEvent, Error=Error>>, Error>
     {
         let (sender, receiver) = futures::sync::mpsc::unbounded();
-        let world = self.universe.world();
+        let world = self.core.world();
         std::thread::spawn(move || {
             loop {
                 let (data, status) = world.any_process().receive_vec::<u8>();

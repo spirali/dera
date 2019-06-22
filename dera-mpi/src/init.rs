@@ -1,6 +1,7 @@
 
 use crate::{MpiServerTransport, MpiWorkerTransport};
 
+use crate::core::Core;
 use mpi::topology::Communicator;
 use failure::{Error, bail};
 use std::rc::Rc;
@@ -17,17 +18,16 @@ pub fn init_mpi_transport() -> Result<(Option<MpiServerTransport>, MpiWorkerTran
         bail!("Insufficient level of threading");
     }
 
-    universe.set_buffer_size(1000);
-    let universe = Rc::new(universe);
+    let core = Rc::new(Core::new(universe));
 
-    let world = universe.world();
-    log::debug!("Initilazing dera-mpi, world rank {}", world.rank());
-    let server = if world.rank() == 0 {
-        Some(MpiServerTransport::new(universe.clone()))
+    let rank = core.rank();
+    log::debug!("Initilazing dera-mpi, world rank {}", rank);
+    let server = if rank == 0 {
+        Some(MpiServerTransport::new(core.clone()))
     } else {
         None
     };
 
-    let worker = MpiWorkerTransport::new(universe);
+    let worker = MpiWorkerTransport::new(core);
     Ok((server, worker))
 }
