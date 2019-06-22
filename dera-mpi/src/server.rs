@@ -4,6 +4,7 @@ use std::rc::Rc;
 use futures::{Future, Stream};
 use failure::Error;
 
+
 use dera::ServerTransportEvent;
 
 pub struct MpiServerTransport {
@@ -20,9 +21,5 @@ impl MpiServerTransport {
         }
     }
 
-    fn start(&self) -> Result<Box<Stream<Item=ServerTransportEvent, Error=Error>>, Error>
-    {
-        Ok(unimplemented!())
-    }
 
 }
