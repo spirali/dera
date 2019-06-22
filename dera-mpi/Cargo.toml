@@ -9,3 +9,4 @@ dera = { path = "../dera" }
 mpi = "*"
 failure = "*"
 log = "*"
+futures = "*"

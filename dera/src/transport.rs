@@ -24,6 +24,7 @@ pub trait ServerTransport {
 
     fn send_message_to_worker(&self, worker_id: WorkerId, tag: MessageTag, message: BytesMut);
     fn start(&self) -> Result<Box<Stream<Item=ServerTransportEvent, Error=Error>>, Error>;
+
 }
 
 
@@ -46,4 +47,6 @@ pub trait WorkerTransport {
 
     fn send_message_to_server(&self, tag: MessageTag, message: BytesMut);
     fn start(&self) -> Result<Box<Stream<Item=(), Error=Error>>, Error>;
+
+    fn worker_id(&self) -> WorkerId;
 }
