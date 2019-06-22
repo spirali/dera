@@ -10,4 +10,4 @@ mod w_manager;
 
 pub use worker::{WorkerId, WorkerRef};
 pub use object::{ObjectId, ObjectInfo, ObjectInfoRef, Object};
-pub use transport::{ServerTransport, ServerTransportEvent, WorkerTransport, WorkerTransportEvent};
+pub use transport::{ServerTransport, ServerTransportEvent, WorkerTransport, WorkerTransportEvent, MessageTag};

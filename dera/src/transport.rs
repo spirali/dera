@@ -4,10 +4,11 @@ use std::rc::Rc;
 use futures::{Future, Stream};
 use failure::Error;
 
+pub type MessageTag = u16;
+
 use crate::{ObjectId, ObjectInfoRef, WorkerId, Object, WorkerRef};
 
 
-pub type MessageTag = u16;
 
 pub enum ServerTransportEvent {
     WorkerMessage(WorkerId, MessageTag, BytesMut),

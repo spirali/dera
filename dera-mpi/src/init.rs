@@ -8,7 +8,7 @@ use std::rc::Rc;
 pub fn init_mpi_transport() -> Result<(Option<MpiServerTransport>, MpiWorkerTransport), Error> {
     let init = mpi::initialize_with_threading(mpi::Threading::Multiple);
 
-    let (universe, threading) = match init {
+    let (mut universe, threading) = match init {
         None => bail!("MPI alread initialized"),
         Some(pair) => pair
     };
@@ -17,6 +17,7 @@ pub fn init_mpi_transport() -> Result<(Option<MpiServerTransport>, MpiWorkerTran
         bail!("Insufficient level of threading");
     }
 
+    universe.set_buffer_size(1000);
     let universe = Rc::new(universe);
 
     let world = universe.world();

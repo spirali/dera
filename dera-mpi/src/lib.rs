@@ -1,3 +1,4 @@
+mod common;
 mod server;
 mod worker;
 mod init;
