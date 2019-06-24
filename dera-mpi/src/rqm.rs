@@ -28,8 +28,15 @@ impl RequestManager {
     }
 
     pub fn check(&self) {
+        // TODO: For small allocation, do not allocate
+
         if self.requests.is_empty() {
             return;
         }
+        let count = self.requests.len();
+        let mut out_count = 0;
+        let mut out : Vec<i32> = Vec::with_capacity(count);
+        out.resize(count, 0);
+        mpi_sys::MPI_Testsome(count as i32, self.requests.get_ptr(), &out_count, out.get_mut_ptr(), mpi_sys::MPI_STATUSES_IGNORE);
     }
 }
