@@ -28,8 +28,10 @@ impl MpiServerTransport {
         }
     }
 
-    pub fn send_message_to_worker(&self, worker_id: WorkerId, tag: MessageTag, message: BytesMut) {
+    pub fn send_message_to_worker(&mut self, worker_id: WorkerId, tag: MessageTag, message: Vec<u8>) {
         let mpi_tag = (tag as mpi::Tag) | crate::common::TAG_MASK_SERVER_TO_WORKER;
+        self.request_manager.send(worker_id as Rank, mpi_tag, message);
+        //self.request_manager.check();
         //self.core.send_message(worker_id as Rank, mpi_tag, message);
         //world.process_at_rank().buffered_send_with_tag(&message[..], mpi_tag);
     }
