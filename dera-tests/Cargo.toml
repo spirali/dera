@@ -1,0 +1,14 @@
+[package]
+name = "dera-tests"
+version = "0.1.0"
+authors = ["Stanislav Bohm <spirali@kreatrix.org>"]
+edition = "2018"
+
+[dependencies]
+dera = { path = "../dera" }
+dera-mpi = { path = "../dera-mpi" }
+failure = "*"
+log = "*"
+futures = "*"
+crossbeam = "*"
+bytes = "*"

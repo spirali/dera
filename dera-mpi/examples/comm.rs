@@ -15,7 +15,9 @@ pub fn main() {
         dbg!("SENDING 2");
         s.send_message_to_worker(1, 123, "Fff".into());
         Some(s)
-    }
+    } else {
+        None
+    };
 
     let w_future = worker.start().unwrap().for_each(|event| {
         match event {

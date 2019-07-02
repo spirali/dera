@@ -2,5 +2,7 @@
 
 members = [
 	"dera",
-        "dera-mpi"
+        "dera-mpi",
+        "dera-local",
+        "dera-tests"
 ]

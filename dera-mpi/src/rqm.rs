@@ -33,14 +33,23 @@ impl RequestManager {
         }
     }
 
-    pub fn check(&mut self) {
-        // TODO: For small number of requests, does not allocate
+    pub fn wait(&mut self) {
+        unsafe {
+            mpi_sys::MPI_Waitall(self.requests.len() as i32, self.requests.as_mut_ptr(), mpi_sys::RSMPI_STATUSES_IGNORE);
+        }
+        self.requests.clear();
+        self.data.clear();
+    }
 
+
+    pub fn check(&mut self) {
         if self.requests.is_empty() {
             return;
         }
         let count = self.requests.len();
         let mut out_count = 0;
+
+        // TODO: For small number of requests, does not allocate
         let mut out : Vec<i32> = Vec::new();
         out.resize(count, 0);
 
@@ -68,5 +77,12 @@ impl RequestManager {
                 self.data[i] = self.data.pop().unwrap();
             }
         }
+    }
+}
+
+
+impl Drop for RequestManager {
+    fn drop(&mut self) {
+        self.wait();
     }
 }
