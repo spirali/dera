@@ -1,4 +1,4 @@
-use dera::WorkerId;
+use crate::WorkerId;
 use mpi::topology::Communicator;
 use mpi::environment::Universe;
 use mpi::point_to_point::Source;
@@ -7,11 +7,11 @@ use futures::{Future, Stream};
 use failure::{Error, format_err};
 
 
-use dera::WorkerTransportEvent;
-use dera::MessageTag;
+use crate::WorkerTransportEvent;
+use crate::MessageTag;
 
 use crate::common;
-use crate::core::Core;
+use super::core::Core;
 
 
 pub struct MpiWorkerTransport {
@@ -43,8 +43,8 @@ impl MpiWorkerTransport {
             loop {
                 let (data, status) = world.any_process().receive_vec::<u8>();
                 match status.tag() {
-                    tag if tag & common::TAG_MASK_SERVER_TO_WORKER != 0 => {
-                        let user_tag = (tag & !common::TAG_MASK_SERVER_TO_WORKER) as MessageTag;
+                    tag if tag & super::common::TAG_MASK_SERVER_TO_WORKER != 0 => {
+                        let user_tag = (tag & !super::common::TAG_MASK_SERVER_TO_WORKER) as MessageTag;
                         sender.send(WorkerTransportEvent::ServerMessage(user_tag, data.into())).unwrap();
                     }
                     tag => {

@@ -1,7 +1,7 @@
 
-use crate::{MpiServerTransport, MpiWorkerTransport};
+use super::{MpiServerTransport, MpiWorkerTransport};
 
-use crate::core::Core;
+use super::core::Core;
 use mpi::topology::Communicator;
 use failure::{Error, bail};
 use std::rc::Rc;

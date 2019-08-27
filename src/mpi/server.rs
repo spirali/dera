@@ -4,13 +4,13 @@ use std::rc::Rc;
 use futures::{Future, Stream};
 use failure::Error;
 
-use dera::{WorkerId, MessageTag};
-use dera::ServerTransportEvent;
+use crate::{WorkerId, MessageTag};
+use crate::ServerTransportEvent;
 use bytes::BytesMut;
 use mpi::point_to_point::Destination;
 
-use crate::core::Core;
-use crate::rqm::RequestManager;
+use super::core::Core;
+use super::rqm::RequestManager;
 
 pub struct MpiServerTransport {
     core: Rc<Core>,
@@ -29,7 +29,7 @@ impl MpiServerTransport {
     }
 
     pub fn send_message_to_worker(&mut self, worker_id: WorkerId, tag: MessageTag, message: Vec<u8>) {
-        let mpi_tag = (tag as mpi::Tag) | crate::common::TAG_MASK_SERVER_TO_WORKER;
+        let mpi_tag = (tag as mpi::Tag) | crate::mpi::common::TAG_MASK_SERVER_TO_WORKER;
         self.request_manager.send(worker_id as Rank, mpi_tag, message);
         //self.request_manager.check();
         //self.core.send_message(worker_id as Rank, mpi_tag, message);

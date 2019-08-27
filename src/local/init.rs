@@ -1,5 +1,5 @@
 
-use crate::{LocalServerTransport, LocalWorkerTransport};
+use super::{LocalServerTransport, LocalWorkerTransport};
 
 use failure::Error;
 

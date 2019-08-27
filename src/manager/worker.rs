@@ -1,7 +1,7 @@
 
 use std::collections::HashSet;
 
-use crate::ObjectInfoRef;
+use super::object::ObjectInfoRef;
 use crate::common::WrappedRcRefCell;
 
 pub type WorkerId = u32;

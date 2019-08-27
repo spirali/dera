@@ -1,8 +1,26 @@
-[workspace]
+[package]
+name = "dera"
+version = "0.1.0"
+authors = ["Stanislav Bohm <spirali@kreatrix.org>"]
+edition = "2018"
 
-members = [
-	"dera",
-        "dera-mpi",
-        "dera-local",
-        "dera-tests"
+
+[features]
+default = []
+mpi-transport = [
+    "mpi", "crossbeam", "mpi-sys"
 ]
+local-transport = [
+
+]
+
+[dependencies]
+log = "*"
+futures="0.1"
+failure="*"
+bytes="*"
+tokio="*"
+
+mpi = {version="*", optional = true}
+crossbeam = {version="*", optional = true}
+mpi-sys = {version="*", optional = true}

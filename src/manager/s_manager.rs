@@ -5,23 +5,23 @@ use futures::{Future, Stream};
 use futures::future;
 use failure::Error;
 
-use crate::transport::{ServerTransport, MessageTag, ServerTransportEvent};
+use super::transport::{ServerTransport, MessageTag, ServerTransportEvent};
 use crate::common::WrappedRcRefCell;
 use crate::{WorkerId, ObjectId, Object, WorkerRef, ObjectInfoRef};
 
 const TAG_CUSTOM_MESSAGE : MessageTag = 1;
 
-enum ServerEvent {
+pub enum ServerEvent {
     OnMessage(WorkerId, BytesMut)
 }
 
-struct ServerManager<Transport: ServerTransport> {
+pub struct ServerManager<Transport: ServerTransport> {
     transport: Transport,
     /// Local worker that lives in the same process as server or None
     local_worker: Option<WorkerRef>,
 }
 
-type ServerManagerRef<Transport> = WrappedRcRefCell<ServerManager<Transport>>;
+pub type ServerManagerRef<Transport> = WrappedRcRefCell<ServerManager<Transport>>;
 
 impl<Transport: ServerTransport> ServerManager<Transport> {
 

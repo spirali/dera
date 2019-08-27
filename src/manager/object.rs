@@ -1,5 +1,5 @@
 
-use super::WorkerId;
+use crate::WorkerId;
 use crate::common::WrappedRcRefCell;
 
 pub type ObjectId = u64;

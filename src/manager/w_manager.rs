@@ -5,21 +5,21 @@ use futures::{Future, Stream};
 use futures::future;
 use failure::Error;
 
-use crate::transport::{WorkerTransport, MessageTag};
+use super::transport::{WorkerTransport, MessageTag};
 use crate::common::WrappedRcRefCell;
 use crate::{WorkerId, ObjectId, Object, WorkerRef};
 
 const TAG_CUSTOM_MESSAGE : MessageTag = 1;
 
-enum WorkerEvent {
+pub enum WorkerEvent {
     OnMessage(WorkerId, BytesMut)
 }
 
-struct WorkerManager<Transport: WorkerTransport> {
+pub struct WorkerManager<Transport: WorkerTransport> {
     transport: Transport,
 }
 
-type WorkerManagerRef<Transport> = WrappedRcRefCell<WorkerManager<Transport>>;
+pub type WorkerManagerRef<Transport> = WrappedRcRefCell<WorkerManager<Transport>>;
 
 impl<Transport: WorkerTransport> WorkerManager<Transport> {
 
