@@ -1,8 +1,9 @@
 //pub mod server;
 //pub mod transport;
 
-mod common;
-mod manager;
+pub mod common;
+pub mod manager;
+pub mod tests;
 
 #[cfg(feature = "local-transport")]
 mod local;
@@ -10,8 +11,7 @@ mod local;
 #[cfg(feature = "mpi-transport")]
 mod mpi;
 
-#[cfg(test)]
-mod tests;
+
 
 pub use self::manager::worker::{WorkerId, WorkerRef};
 pub use self::manager::object::{ObjectId, ObjectInfo, ObjectInfoRef, Object};

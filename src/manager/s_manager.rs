@@ -11,19 +11,20 @@ use crate::{WorkerId, ObjectId, Object, WorkerRef, ObjectInfoRef};
 
 const TAG_CUSTOM_MESSAGE : MessageTag = 1;
 
+#[derive(Debug)]
 pub enum ServerEvent {
     OnMessage(WorkerId, BytesMut)
 }
 
-pub struct ServerManager<Transport: ServerTransport> {
-    transport: Transport,
+pub struct ServerManager {
+    transport: Box<dyn ServerTransport>,
     /// Local worker that lives in the same process as server or None
     local_worker: Option<WorkerRef>,
 }
 
-pub type ServerManagerRef<Transport> = WrappedRcRefCell<ServerManager<Transport>>;
+pub type ServerManagerRef = WrappedRcRefCell<ServerManager>;
 
-impl<Transport: ServerTransport> ServerManager<Transport> {
+impl ServerManager {
 
     fn pick_worker_for_fetch(&self, object_id: ObjectId) -> WorkerId {
         unimplemented!();
@@ -31,8 +32,9 @@ impl<Transport: ServerTransport> ServerManager<Transport> {
 
 }
 
-impl<Transport: ServerTransport> ServerManagerRef<Transport> {
-    pub fn new(transport: Transport) -> Self {
+impl ServerManagerRef {
+
+    pub fn new(transport: Box<dyn ServerTransport>) -> Self {
         WrappedRcRefCell::wrap(ServerManager {
             transport,
             local_worker: None,

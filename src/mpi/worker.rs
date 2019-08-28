@@ -7,11 +7,12 @@ use futures::{Future, Stream};
 use failure::{Error, format_err};
 
 
-use crate::WorkerTransportEvent;
+use crate::{WorkerTransportEvent, WorkerTransport, ObjectId, Object};
 use crate::MessageTag;
 
 use crate::common;
 use super::core::Core;
+use bytes::BytesMut;
 
 
 pub struct MpiWorkerTransport {
@@ -35,7 +36,20 @@ impl MpiWorkerTransport {
         self.core.rank() as WorkerId
     }
 
-    pub fn start(&self) -> Result<Box<Stream<Item=WorkerTransportEvent, Error=Error>>, Error>
+}
+
+
+impl WorkerTransport for MpiWorkerTransport {
+
+    fn fetch_object(&self, worker_id: WorkerId, object_id: ObjectId) -> Box<Future<Item=Object, Error=Error>> {
+        unimplemented!()
+    }
+
+    fn send_message_to_server(&self, tag: MessageTag, message: BytesMut) {
+        unimplemented!();
+    }
+
+    fn start(&self) -> Result<Box<Stream<Item=WorkerTransportEvent, Error=Error>>, Error>
     {
         let (sender, receiver) = futures::sync::mpsc::unbounded();
         let world = self.core.world();
@@ -56,4 +70,7 @@ impl MpiWorkerTransport {
         Ok(Box::new(receiver.map_err(|()| format_err!("Receiver failed"))))
     }
 
+    fn worker_id(&self) -> WorkerId {
+        self.core.rank() as WorkerId
+    }
 }

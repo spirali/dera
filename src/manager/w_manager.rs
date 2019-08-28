@@ -11,23 +11,24 @@ use crate::{WorkerId, ObjectId, Object, WorkerRef};
 
 const TAG_CUSTOM_MESSAGE : MessageTag = 1;
 
+#[derive(Debug)]
 pub enum WorkerEvent {
     OnMessage(WorkerId, BytesMut)
 }
 
-pub struct WorkerManager<Transport: WorkerTransport> {
-    transport: Transport,
+pub struct WorkerManager {
+    transport: Box<dyn WorkerTransport>,
 }
 
-pub type WorkerManagerRef<Transport> = WrappedRcRefCell<WorkerManager<Transport>>;
+pub type WorkerManagerRef = WrappedRcRefCell<WorkerManager>;
 
-impl<Transport: WorkerTransport> WorkerManager<Transport> {
+impl WorkerManager {
 
 }
 
-impl<Transport: WorkerTransport> WorkerManagerRef<Transport> {
+impl WorkerManagerRef {
 
-    pub fn new(transport: Transport) -> Self {
+    pub fn new(transport: Box<dyn WorkerTransport>) -> Self {
         WrappedRcRefCell::wrap(WorkerManager {
             transport,
         })
@@ -74,5 +75,4 @@ impl<Transport: WorkerTransport> WorkerManagerRef<Transport> {
         };*/
         futures::future::ok(())
     }*/
-
 }

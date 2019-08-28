@@ -21,7 +21,7 @@ pub trait ServerTransport {
 
     fn fetch_object(&self, worker_id: WorkerId, object_id: ObjectId) -> Box<Future<Item=Object, Error=Error>>;
     fn fetch_object_part(&self, worker_id: WorkerId, object_id: ObjectId, offset: u64, size: u64) -> Box<Future<Item=BytesMut, Error=Error>>;
-    fn push_object(worker_id: WorkerId, object: Rc<Object>);
+    fn push_object(&self, worker_id: WorkerId, object: Rc<Object>);
 
     fn send_message_to_worker(&self, worker_id: WorkerId, tag: MessageTag, message: BytesMut);
     fn start(&self) -> Result<Box<Stream<Item=ServerTransportEvent, Error=Error>>, Error>;
@@ -47,7 +47,7 @@ pub trait WorkerTransport {
     fn fetch_object(&self, worker_id: WorkerId, object_id: ObjectId) -> Box<Future<Item=Object, Error=Error>>;
 
     fn send_message_to_server(&self, tag: MessageTag, message: BytesMut);
-    fn start(&self) -> Result<Box<Stream<Item=(), Error=Error>>, Error>;
+    fn start(&self) -> Result<Box<Stream<Item=WorkerTransportEvent, Error=Error>>, Error>;
 
     fn worker_id(&self) -> WorkerId;
 }

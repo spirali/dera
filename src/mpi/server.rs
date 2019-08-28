@@ -2,12 +2,14 @@ use mpi::environment::Universe;
 use mpi::topology::{Rank, Communicator};
 use std::rc::Rc;
 use futures::{Future, Stream};
-use failure::Error;
+use failure::{Error, format_err};
 
-use crate::{WorkerId, MessageTag};
+use crate::{WorkerId, MessageTag, ObjectId, Object};
 use crate::ServerTransportEvent;
+use crate::ServerTransport;
 use bytes::BytesMut;
 use mpi::point_to_point::Destination;
+use mpi::point_to_point::Source;
 
 use super::core::Core;
 use super::rqm::RequestManager;
@@ -35,6 +37,27 @@ impl MpiServerTransport {
         //self.core.send_message(worker_id as Rank, mpi_tag, message);
         //world.process_at_rank().buffered_send_with_tag(&message[..], mpi_tag);
     }
+}
 
 
+impl ServerTransport for MpiServerTransport {
+    fn fetch_object(&self, worker_id: WorkerId, object_id: ObjectId) -> Box<Future<Item=Object, Error=Error>> {
+        unimplemented!()
+    }
+
+    fn fetch_object_part(&self, worker_id: WorkerId, object_id: ObjectId, offset: u64, size: u64) -> Box<Future<Item=BytesMut, Error=Error>> {
+        unimplemented!()
+    }
+
+    fn push_object(&self, worker_id: WorkerId, object: Rc<Object>) {
+        unimplemented!()
+    }
+
+    fn send_message_to_worker(&self, worker_id: WorkerId, tag: MessageTag, message: BytesMut) {
+        unimplemented!()
+    }
+
+    fn start(&self) -> Result<Box<Stream<Item=ServerTransportEvent, Error=Error>>, Error> {
+        unimplemented!()
+    }
 }
