@@ -8,7 +8,7 @@ use failure::{Error, format_err};
 
 
 use crate::{WorkerTransportEvent, WorkerTransport, ObjectId, Object};
-use crate::MessageTag;
+use crate::{MessageTag, ServerTransportEvent};
 
 use crate::common;
 use super::core::Core;
@@ -16,15 +16,16 @@ use bytes::BytesMut;
 
 
 pub struct MpiWorkerTransport {
-    core: Rc<Core>
+    core: Rc<Core>,
+    server_sender: Option<futures::sync::mpsc::UnboundedSender<ServerTransportEvent>>,
 }
 
 
 impl MpiWorkerTransport {
 
-    pub(crate) fn new(core: Rc<Core>) -> Self {
+    pub(crate) fn new(core: Rc<Core>, server_sender: Option<futures::sync::mpsc::UnboundedSender<ServerTransportEvent>>) -> Self {
         MpiWorkerTransport {
-            core
+            core, server_sender
         }
     }
 
@@ -49,7 +50,7 @@ impl WorkerTransport for MpiWorkerTransport {
         unimplemented!();
     }
 
-    fn start(&self) -> Result<Box<Stream<Item=WorkerTransportEvent, Error=Error>>, Error>
+    fn start(&mut self) -> Result<Box<Stream<Item=WorkerTransportEvent, Error=Error>>, Error>
     {
         let (sender, receiver) = futures::sync::mpsc::unbounded();
         let world = self.core.world();

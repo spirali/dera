@@ -6,13 +6,13 @@ use failure::Error;
 
 pub type MessageTag = u16;
 
-use crate::{ObjectId, ObjectInfoRef, WorkerId, Object, WorkerRef};
+use crate::{ObjectId, ObjectInfoRef, Object, WorkerRef, WorkerId};
 
 
 
 pub enum ServerTransportEvent {
     WorkerMessage(WorkerId, MessageTag, BytesMut),
-    NewWorker(WorkerRef),
+    NewWorker(WorkerId, String),
     LostWorker(WorkerRef),
 }
 
@@ -24,7 +24,7 @@ pub trait ServerTransport {
     fn push_object(&self, worker_id: WorkerId, object: Rc<Object>);
 
     fn send_message_to_worker(&self, worker_id: WorkerId, tag: MessageTag, message: BytesMut);
-    fn start(&self) -> Result<Box<Stream<Item=ServerTransportEvent, Error=Error>>, Error>;
+    fn start(&mut self) -> Result<Box<Stream<Item=ServerTransportEvent, Error=Error>>, Error>;
 
 }
 
@@ -47,7 +47,7 @@ pub trait WorkerTransport {
     fn fetch_object(&self, worker_id: WorkerId, object_id: ObjectId) -> Box<Future<Item=Object, Error=Error>>;
 
     fn send_message_to_server(&self, tag: MessageTag, message: BytesMut);
-    fn start(&self) -> Result<Box<Stream<Item=WorkerTransportEvent, Error=Error>>, Error>;
+    fn start(&mut self) -> Result<Box<Stream<Item=WorkerTransportEvent, Error=Error>>, Error>;
 
     fn worker_id(&self) -> WorkerId;
 }

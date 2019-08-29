@@ -15,24 +15,28 @@ fn start_ping(server_mng: Option<ServerManagerRef>, worker_mng: Option<WorkerMan
 
     let sfuture : Option<_> = server_mng.map(|sm| {
         let s = sm.clone();
-        sm.start(|msg| {
+        sm.start(move |msg| {
             dbg!(msg);
+            let x = &s;
         }).unwrap().map_err(|e| { panic!("{}", e) })
     });
 
     let wfuture : Option<_> = worker_mng.map(|wm| {
         let w = wm.clone();
-        wm.start(|msg| {
-
+        wm.start(move |msg| {
+            dbg!();
+            let x = &w;
         }).unwrap().map_err(|e| { panic!("{}", e) })
     });
 
+    println!("Init finished ...");
     match (sfuture, wfuture) {
         (None, Some(f)) => { current_thread::block_on_all(f).unwrap(); },
         (Some(f), None) => { current_thread::block_on_all(f).unwrap(); },
         (Some(f1), Some(f2)) => { current_thread::block_on_all(f1.select(f2).map(|_| ()).map_err(|_| ())).unwrap(); },
         (None, None) => unreachable!()
     };
+    println!("Terminating ...");
 }
 
 

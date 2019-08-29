@@ -57,7 +57,7 @@ impl WorkerManagerRef {
     /// Returns a future that represent running manager. Manager can be stopped by dropping this future.
     pub fn start(&self, on_event: impl Fn(WorkerEvent)) -> Result<impl Future<Item=(), Error=Error>, Error> {
         let manager_ref = self.clone();
-        let manager = self.get();
+        let mut manager = self.get_mut();
         let message_stream = manager.transport.start().unwrap();
         let msg_process = message_stream.for_each(move |event| {
             futures::future::ok(unimplemented!())

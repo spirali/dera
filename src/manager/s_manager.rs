@@ -13,7 +13,8 @@ const TAG_CUSTOM_MESSAGE : MessageTag = 1;
 
 #[derive(Debug)]
 pub enum ServerEvent {
-    OnMessage(WorkerId, BytesMut)
+    OnMessage(WorkerId, BytesMut),
+    NewWorker(WorkerRef),
 }
 
 pub struct ServerManager {
@@ -85,7 +86,7 @@ impl ServerManagerRef {
     /// Returns a future that represent running manager. Manager can be stopped by dropping this future.
     pub fn start(&self, on_event: impl Fn(ServerEvent)) -> Result<impl Future<Item=(), Error=Error>, Error> {
         let manager_ref = self.clone();
-        let manager = self.get();
+        let mut manager = self.get_mut();
         let message_stream = manager.transport.start().unwrap();
         let msg_process = message_stream.for_each(move |event| {
             match event {
@@ -96,8 +97,13 @@ impl ServerManagerRef {
                 ServerTransportEvent::WorkerMessage(worker_id, tag, msg) => {
                     future::Either::B(manager_ref._process_message(worker_id, tag, msg))
                 },
-                _ => {
-                    unimplemented!();
+                ServerTransportEvent::NewWorker(worker_id, fullname) => {
+                    let worker = WorkerRef::new(worker_id, &fullname);
+                    on_event(ServerEvent::NewWorker(worker));
+                    future::Either::A(futures::future::ok(()))
+                },
+                ServerTransportEvent::LostWorker(_) => {
+                    unimplemented!()
                 }
             }
         });

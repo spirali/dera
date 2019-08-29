@@ -17,16 +17,18 @@ use super::rqm::RequestManager;
 pub struct MpiServerTransport {
     core: Rc<Core>,
     request_manager: RequestManager,
+    receiver: Option<futures::sync::mpsc::UnboundedReceiver<ServerTransportEvent>>
 }
 
 
 impl MpiServerTransport {
 
-    pub(crate) fn new(core: Rc<Core>) -> Self {
+    pub(crate) fn new(core: Rc<Core>, receiver: futures::sync::mpsc::UnboundedReceiver<ServerTransportEvent>) -> Self {
         assert!(core.rank() == 0);
         MpiServerTransport {
             core,
             request_manager: RequestManager::new(),
+            receiver: Some(receiver),
         }
     }
 
@@ -57,7 +59,7 @@ impl ServerTransport for MpiServerTransport {
         unimplemented!()
     }
 
-    fn start(&self) -> Result<Box<Stream<Item=ServerTransportEvent, Error=Error>>, Error> {
-        unimplemented!()
+    fn start(&mut self) -> Result<Box<Stream<Item=ServerTransportEvent, Error=Error>>, Error> {
+        Ok(Box::new(self.receiver.take().unwrap().map_err(|()| unreachable!())))
     }
 }
