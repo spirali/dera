@@ -6,6 +6,7 @@ use super::core::Core;
 use mpi::topology::Communicator;
 use failure::{Error, bail};
 use std::rc::Rc;
+use std::sync::Arc;
 
 
 pub fn init_mpi_transport() -> Result<(Option<MpiServerTransport>, MpiWorkerTransport), Error> {
@@ -20,14 +21,14 @@ pub fn init_mpi_transport() -> Result<(Option<MpiServerTransport>, MpiWorkerTran
         bail!("Insufficient level of threading");
     }
 
-    let core = Rc::new(Core::new(universe));
+    let core = Arc::new(Core::new(universe));
     let rank = core.rank();
     log::debug!("Initilazing dera-mpi, world rank {}", rank);
     let (server, server_sender) = if rank == 0 {
         let (server_sender, sender_receiver) = futures::sync::mpsc::unbounded();
         let transport = MpiServerTransport::new(core.clone(), sender_receiver);
         for r in 0..core.world().size() {
-            let fullname = format!("{}/TODO", r);
+            let fullname = format!("rank{}/TODO", r);
             server_sender.unbounded_send(ServerTransportEvent::NewWorker(r as WorkerId, fullname));
         }
         (Some(transport), Some(server_sender))

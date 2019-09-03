@@ -26,11 +26,11 @@ impl RequestManager {
             mpi_sys::MPI_Isend(data.as_ptr() as *const c_void, data.len() as i32, mpi_sys::RSMPI_UINT8_T, rank, tag, mpi_sys::RSMPI_COMM_WORLD, &mut request);
         }
         self.requests.push(request);
-        dbg!(&data);
+        //dbg!(&data);
         self.data.push(data);
-        for x in &self.data {
+        /*for x in &self.data {
             dbg!(x);
-        }
+        }*/
     }
 
     pub fn wait(&mut self) {

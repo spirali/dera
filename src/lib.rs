@@ -16,5 +16,5 @@ mod mpi;
 pub use self::manager::worker::{WorkerId, WorkerRef};
 pub use self::manager::object::{ObjectId, ObjectInfo, ObjectInfoRef, Object};
 pub use self::manager::transport::{ServerTransport, ServerTransportEvent, WorkerTransport, WorkerTransportEvent, MessageTag};
-pub use self::manager::s_manager::{ServerManagerRef};
-pub use self::manager::w_manager::{WorkerManagerRef};
+pub use self::manager::s_manager::{ServerManagerRef, ServerEvent};
+pub use self::manager::w_manager::{WorkerManagerRef, WorkerEvent};

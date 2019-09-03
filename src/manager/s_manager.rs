@@ -1,6 +1,7 @@
 
 use bytes::{BytesMut};
 use std::rc::Rc;
+use std::collections::HashMap;
 use futures::{Future, Stream};
 use futures::future;
 use failure::Error;
@@ -20,6 +21,7 @@ pub enum ServerEvent {
 pub struct ServerManager {
     transport: Box<dyn ServerTransport>,
     /// Local worker that lives in the same process as server or None
+    workers : HashMap<WorkerId, WorkerRef>,
     local_worker: Option<WorkerRef>,
 }
 
@@ -33,18 +35,26 @@ impl ServerManager {
 
 }
 
+impl Drop for ServerManager {
+    fn drop(&mut self) {
+        println!("SM dropped");
+        log::debug!("ServerManager dropped");
+    }
+}
+
 impl ServerManagerRef {
 
     pub fn new(transport: Box<dyn ServerTransport>) -> Self {
         WrappedRcRefCell::wrap(ServerManager {
             transport,
+            workers: Default::default(),
             local_worker: None,
         })
     }
 
     /// Sends custem message to worker
-    pub fn send_message_to_worker(&self, worker_id: WorkerId, message: BytesMut) {
-        let manager = self.get();
+    pub fn send_message_to_worker(&self, worker_id: WorkerId, message: Vec<u8>) {
+        let mut manager = self.get_mut();
         manager.transport.send_message_to_worker(worker_id, TAG_CUSTOM_MESSAGE, message);
     }
 
@@ -77,6 +87,10 @@ impl ServerManagerRef {
         unimplemented!();
     }
 
+    pub fn worker_by_id(&self, worker_id: &WorkerId) -> WorkerRef {
+        let manager = self.get();
+        manager.workers.get(&worker_id).unwrap().clone()
+    }
 
     //fn push_object(object: Rc<Object>);
 
@@ -84,10 +98,11 @@ impl ServerManagerRef {
     /// Start manager
     /// Argument is function that is called for every message
     /// Returns a future that represent running manager. Manager can be stopped by dropping this future.
-    pub fn start(&self, on_event: impl Fn(ServerEvent)) -> Result<impl Future<Item=(), Error=Error>, Error> {
+    pub fn start(&self, mut on_event: impl FnMut(ServerEvent)) -> Result<impl Future<Item=(), Error=Error>, Error> {
         let manager_ref = self.clone();
         let mut manager = self.get_mut();
         let message_stream = manager.transport.start().unwrap();
+        let s_manager = self.clone();
         let msg_process = message_stream.for_each(move |event| {
             match event {
                 ServerTransportEvent::WorkerMessage(worker_id, TAG_CUSTOM_MESSAGE, msg) => {
@@ -99,6 +114,10 @@ impl ServerManagerRef {
                 },
                 ServerTransportEvent::NewWorker(worker_id, fullname) => {
                     let worker = WorkerRef::new(worker_id, &fullname);
+                    {
+                        let mut manager = s_manager.get_mut();
+                        manager.workers.insert(worker_id, worker.clone());
+                    }
                     on_event(ServerEvent::NewWorker(worker));
                     future::Either::A(futures::future::ok(()))
                 },

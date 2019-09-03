@@ -21,6 +21,16 @@ impl WorkerRef {
             worker_id, fullname: fullname.to_string(), objects: Default::default(),
         })
     }
+
+    pub fn worker_id(&self) -> WorkerId {
+       let worker = self.get();
+       worker.worker_id
+    }
+
+    pub fn fullname(&self) -> String {
+        let worker = self.get();
+        worker.fullname.clone()
+    }
 }
 
 
